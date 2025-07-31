@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Friday Amount Tracker</title>
+  <title>Tracker</title>
   <style>
     body {
       font-family: sans-serif;
@@ -27,6 +27,7 @@
     }
     .month-content {
       margin-top: 10px;
+      display: none; /* <- Collapsed by default */
     }
     .day {
       display: inline-block;
@@ -51,9 +52,9 @@
 </head>
 <body>
 
-  <h1>Select Dates & Enter Friday Amounts</h1>
+  <h1>Tracker</h1>
   <div id="checkboxContainer"></div>
-  <div id="totalContainer">Total Friday Amount: $0.00</div>
+  <div id="totalContainer">Total: $0.00</div>
 
   <script>
     const container = document.getElementById("checkboxContainer");
@@ -85,11 +86,11 @@
       // Header with toggle
       const header = document.createElement("div");
       header.className = "month-header";
-      header.innerHTML = `<strong>${month.name}</strong> <button>Hide</button>`;
+      header.innerHTML = `<strong>${month.name}</strong> <button>Show</button>`;
       monthDiv.appendChild(header);
 
       const content = document.createElement("div");
-      content.className = "month-content";
+      content.className = "month-content"; // starts hidden
 
       for (let day = 1; day <= month.days; day++) {
         const dateStr = `${month.name} ${day}`;
@@ -155,7 +156,7 @@
         const num = parseFloat(amount);
         if (!isNaN(num)) total += num;
       }
-      totalDisplay.textContent = `Total Friday Amount: $${total.toFixed(2)}`;
+      totalDisplay.textContent = `Total: $${total.toFixed(2)}`;
     }
 
     updateTotal();
