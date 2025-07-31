@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tracker</title>
+  <title>Friday Amount Tracker</title>
   <style>
     body {
       font-family: sans-serif;
@@ -12,9 +12,21 @@
     }
     .month {
       margin-bottom: 25px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
     }
-    .month h3 {
-      margin-bottom: 10px;
+    .month-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .month-content {
+      margin-top: 10px;
     }
     .day {
       display: inline-block;
@@ -39,9 +51,9 @@
 </head>
 <body>
 
-  <h1>Tracker</h1>
+  <h1>Select Dates & Enter Friday Amounts</h1>
   <div id="checkboxContainer"></div>
-  <div id="totalContainer">Total : $0.00</div>
+  <div id="totalContainer">Total Friday Amount: $0.00</div>
 
   <script>
     const container = document.getElementById("checkboxContainer");
@@ -57,25 +69,27 @@
       { name: "February", days: 28, monthNum: 1 }
     ];
 
-    // Load saved data
     const savedDates = JSON.parse(localStorage.getItem("selectedDates") || "[]");
     const savedAmounts = JSON.parse(localStorage.getItem("fridayAmounts") || "{}");
 
-    // Helper: Check if a date is a Friday
     function isFriday(monthIndex, day) {
       const year = new Date().getFullYear();
       const date = new Date(year, monthIndex, day);
       return date.getDay() === 5;
     }
 
-    // Create interface
     months.forEach(month => {
       const monthDiv = document.createElement("div");
       monthDiv.className = "month";
 
-      const header = document.createElement("h3");
-      header.textContent = month.name;
+      // Header with toggle
+      const header = document.createElement("div");
+      header.className = "month-header";
+      header.innerHTML = `<strong>${month.name}</strong> <button>Hide</button>`;
       monthDiv.appendChild(header);
+
+      const content = document.createElement("div");
+      content.className = "month-content";
 
       for (let day = 1; day <= month.days; day++) {
         const dateStr = `${month.name} ${day}`;
@@ -88,7 +102,6 @@
         checkbox.name = "dates";
         checkbox.value = dateStr;
 
-        // Restore checkbox state
         if (savedDates.includes(dateStr)) checkbox.checked = true;
 
         checkbox.addEventListener("change", saveSelections);
@@ -96,14 +109,12 @@
         label.appendChild(checkbox);
         label.append(` ${day}`);
 
-        // If it's a Friday, add input box
         if (isFriday(month.monthNum, day)) {
           const input = document.createElement("input");
           input.type = "number";
           input.className = "amountInput";
           input.placeholder = "Friday $";
 
-          // Restore saved amount
           if (savedAmounts[dateKey]) {
             input.value = savedAmounts[dateKey];
           }
@@ -117,9 +128,18 @@
           label.appendChild(input);
         }
 
-        monthDiv.appendChild(label);
+        content.appendChild(label);
       }
 
+      // Toggle logic
+      const toggleBtn = header.querySelector("button");
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = content.style.display === "none";
+        content.style.display = isHidden ? "block" : "none";
+        toggleBtn.textContent = isHidden ? "Hide" : "Show";
+      });
+
+      monthDiv.appendChild(content);
       container.appendChild(monthDiv);
     });
 
@@ -135,10 +155,9 @@
         const num = parseFloat(amount);
         if (!isNaN(num)) total += num;
       }
-      totalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+      totalDisplay.textContent = `Total Friday Amount: $${total.toFixed(2)}`;
     }
 
-    // On load
     updateTotal();
   </script>
 
